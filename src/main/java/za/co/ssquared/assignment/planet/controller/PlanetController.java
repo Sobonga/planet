@@ -1,50 +1,70 @@
 package za.co.ssquared.assignment.planet.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import za.co.ssquared.assignment.planet.model.Planet;
 import za.co.ssquared.assignment.planet.repo.PlanetRepository;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class PlanetController {
 
     @Autowired
-    PlanetRepository planetRepository;
+    private PlanetRepository planetRepository;
 
-    @RequestMapping("/getAllPlanets")
-    @ResponseBody
-    public List<Planet> getAllPlanets(){
-        return planetRepository.getAllPlanets ();
+    //Exposing GET methods on Planet Resource
+    @GetMapping("/planets")
+    public List<Planet> retrieveAllPlanets() {
+        return planetRepository.findAll();
     }
 
-    @RequestMapping("/getPlanet")
-    @ResponseBody
-    public Planet getPlanet(@RequestParam("planet_id") long planet_id){
-        return planetRepository.getPlanet (planet_id);
-    }
+    //method to expose the details of a specific planet
+    @GetMapping("/planets/{planet_id}")
+    public Planet retrievePlanet(@PathVariable long planet_id) {
+        Optional<Planet> planet = planetRepository.findById(planet_id);
 
-    @RequestMapping("/addPlanet")
-    @ResponseBody
-    public String addPlanet(@RequestParam("planet_id") long planet_id,@RequestParam("planet_node") String planet_node,
-                          @RequestParam("planet_name") String planet_name){
-        if(planetRepository.addPlanet (planet_id,planet_node,planet_name) >= 1){
-            return "Planet Added Successfully";
-        }else{
-            return "Something went wrong !";
+        if (!planet.isPresent()) {
+            return null;
         }
+        return planet.get();
     }
-    @RequestMapping("/detetePlanet")
-    @ResponseBody
-    public String detetePlanet(@RequestParam("planet_id") long planet_id){
-        if(planetRepository.deletePlanet(planet_id) >= 1){
-            return "Planet Deleted Successfully";
-        }else{
-            return "Something went wrong !";
-        }
+
+    //Expose DELETE Method on Planet Resource
+    @DeleteMapping("/planets/{planet_id}")
+    public void deletePlanet(@PathVariable long planet_id) {
+        planetRepository.deleteById(planet_id);
+    }
+
+    //Method to create a new planet
+    @PostMapping("/planets")
+    public ResponseEntity<Object> createPlanet(@RequestBody Planet planet) {
+        Planet savedPlanet = planetRepository.save(planet);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{planet_id}")
+                .buildAndExpand(savedPlanet.getPlanet_id ()).toUri();
+
+        return ResponseEntity.created(location).build();
+
+    }
+
+    //Method to update existing planet
+    @PutMapping("/planets/{planet_id}")
+    public ResponseEntity<Object> updateStudent(@RequestBody Planet planet, @PathVariable long planet_id) {
+
+        Optional<Planet> planetOptional = planetRepository.findById(planet_id);
+
+        if (!planetOptional.isPresent())
+            return ResponseEntity.notFound().build();
+
+        planet.setPlanet_id (planet_id);
+
+        planetRepository.save(planet);
+
+        return ResponseEntity.noContent().build();
     }
 }

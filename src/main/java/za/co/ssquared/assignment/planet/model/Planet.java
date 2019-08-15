@@ -1,6 +1,7 @@
 package za.co.ssquared.assignment.planet.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Objects;
 
 @Entity
@@ -16,7 +17,6 @@ public class Planet {
 
     @Column(name = "planet_name")
     private String planet_name;
-
 
     public Planet(){}
 

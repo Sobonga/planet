@@ -24,6 +24,8 @@ public class Routes {
     @Column(name = "distance")
     private double distance;
 
+    public Routes(){}
+
     public Routes(long routes_id,int route,String planet_origin,String planet_destination,double distance) {
         this.routes_id = routes_id;
         this.route = route;

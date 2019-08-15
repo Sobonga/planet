@@ -1,50 +1,70 @@
 package za.co.ssquared.assignment.planet.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import za.co.ssquared.assignment.planet.model.Routes;
 import za.co.ssquared.assignment.planet.repo.RoutesRepository;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class RoutesController {
 
     @Autowired
-    RoutesRepository routesRepository;
+    private RoutesRepository routesRepository;
 
-    @RequestMapping("/getAllRoutes")
-    @ResponseBody
-    public List<Routes> getAllRoutes(){
-        return routesRepository.getAllRoutes ();
+    //Exposing GET methods on Routes Resource
+    @GetMapping("/routes")
+    public List<Routes> retrieveAllRoutes() {
+        return routesRepository.findAll();
     }
 
-    @RequestMapping("/getRoute")
-    @ResponseBody
-    public Routes getRoute(@RequestParam("routes_id") long routes_id){
-        return routesRepository.getRoutes (routes_id);
-    }
+    //method to expose the details of a specific route
+    @GetMapping("/routes/{routes_id}")
+    public Routes retrieveRoutes(@PathVariable long routes_id) {
+        Optional<Routes> routes = routesRepository.findById(routes_id);
 
-    @RequestMapping("/addRoute")
-    @ResponseBody
-    public String addRoute(@RequestParam("routes_id") long routes_id,@RequestParam("route") int route,
-                          @RequestParam("planet_origin") String planet_origin, @RequestParam("planet_destination") String planet_destination,@RequestParam("planet_distance") Double planet_distance){
-        if(routesRepository.addRoutes (routes_id,route,planet_origin,planet_destination,planet_distance) >= 1){
-            return "Route Added Successfully";
-        }else{
-            return "Something went wrong !";
+        if (!routes.isPresent()) {
+            return null;
         }
+        return routes.get();
     }
-    @RequestMapping("/deteteRoute")
-    @ResponseBody
-    public String deteteRoute(@RequestParam("routes_id") long routes_id){
-        if(routesRepository.deleteRoute(routes_id) >= 1){
-            return "Route Deleted Successfully";
-        }else{
-            return "Something went wrong !";
-        }
+
+    //Expose DELETE Method on routes Resource
+    @DeleteMapping("/routes/{routes_id}")
+    public void deleteRoutes(@PathVariable long routes_id) {
+        routesRepository.deleteById(routes_id);
+    }
+
+    //Method to create a new route
+    @PostMapping("/routes")
+    public ResponseEntity<Object> createRoute(@RequestBody Routes routes) {
+        Routes savedRoute = routesRepository.save(routes);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{routes_id}")
+                .buildAndExpand(savedRoute.getRoutes_id ()).toUri();
+
+        return ResponseEntity.created(location).build();
+
+    }
+
+    //Method to update existing routes
+    @PutMapping("/routes/{routes_id}")
+    public ResponseEntity<Object> updateRoutes(@RequestBody Routes routes, @PathVariable long routes_id) {
+
+        Optional<Routes> routeOptional = routesRepository.findById(routes_id);
+
+        if (!routeOptional.isPresent())
+            return ResponseEntity.notFound().build();
+
+        routes.setRoutes_id (routes_id);
+
+        routesRepository.save(routes);
+
+        return ResponseEntity.noContent().build();
     }
 }

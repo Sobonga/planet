@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import za.co.ssquared.assignment.planet.model.Planet;
+import za.co.ssquared.assignment.planet.model.Routes;
 
 import javax.sql.DataSource;
 
@@ -36,17 +37,6 @@ public class FileImportJob {
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
 
-
-
-
-
-/*    @Bean
-    public HibernateItemWriter<Planet> writer(SessionFactory sessionFactory) {
-        return new HibernateItemWriterBuilder<Planet>()
-                .sessionFactory ( sessionFactory )
-                .build();
-    }*/
-
     @Bean
     public JdbcBatchItemWriter<Planet> writer(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder <Planet> ()
@@ -55,6 +45,16 @@ public class FileImportJob {
                 .dataSource ( dataSource )
                 .build ();
     }
+
+    @Bean
+    public JdbcBatchItemWriter<Routes> itemWriter(DataSource dataSource) {
+        return new JdbcBatchItemWriterBuilder <Routes> ()
+                .itemSqlParameterSourceProvider ( new BeanPropertyItemSqlParameterSourceProvider <> () )
+                .sql (  "INSERT INTO routes (route, planet_origin,planet_destination,distance) VALUES (:route,:planet_origin,:planet_destination,:distance)" )
+                .dataSource ( dataSource )
+                .build ();
+    }
+
 
     @Bean
     public FlatFileItemReader<Planet> reader() {
@@ -71,10 +71,31 @@ public class FileImportJob {
     }
 
     @Bean
+    public FlatFileItemReader<Routes> readerRoute() {
+        return new FlatFileItemReaderBuilder<Routes>()
+                .name("routesItemReader")
+                .linesToSkip ( 1 )
+                .resource(new ClassPathResource ("data/routes.txt"))
+                .delimited().delimiter ( "|" )
+                .names(new String[]{"route", "planet_origin","planet_destination","distance"})
+                .fieldSetMapper(new BeanWrapperFieldSetMapper<Routes> () {{
+                    setTargetType(Routes.class);
+                }})
+                .build();
+    }
+
+    @Bean
     @Primary
     public ItemProcessor processor() {
         return new ItemProcessor ();
     }
+
+    @Bean
+    @Primary
+    public ItemRouteProcessor process() {
+        return new ItemRouteProcessor ();
+    }
+
 
     @Bean
     public Step step(JdbcBatchItemWriter<Planet> writer) {
@@ -86,10 +107,31 @@ public class FileImportJob {
                 .build();
     }
 
+    @Bean
+    public Step step1(JdbcBatchItemWriter<Routes> itemWriter){
+        return stepBuilderFactory.get ( "step2" )
+                .<Routes,Routes>chunk ( 10 )
+                .reader(readerRoute())
+                .processor ( process () )
+                .writer ( itemWriter )
+                .build ();
+
+    }
+
 
     @Bean
-    public Job importUserJob(JobCompletionNotificationListener listener,Step step1) {
-        return jobBuilderFactory.get("importUserJob")
+    public Job importPlanetJob(JobCompletionNotificationListener listener,Step step ) {
+        return jobBuilderFactory.get("importPlanetJob")
+                .incrementer(new RunIdIncrementer ())
+                .listener(listener)
+                .flow(step)
+                .end()
+                .build();
+    }
+
+    @Bean
+    public Job importRouteJob(JobCompletionNotificationListener listener,Step step1 ) {
+        return jobBuilderFactory.get("importRouteJob")
                 .incrementer(new RunIdIncrementer ())
                 .listener(listener)
                 .flow(step1)
