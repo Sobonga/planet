@@ -8,18 +8,23 @@ import java.util.Objects;
 public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "planet_id")
     private long planet_id;
 
-    private String PlanetNode;
+    @Column(name = "planet_node")
+    private String planet_node;
 
-    private String PlanetName;
+    @Column(name = "planet_name")
+    private String planet_name;
 
-    public Planet(long planet_id,String PlanetNode,String PlanetName) {
+
+    public Planet(){}
+
+    public Planet(long planet_id,String planet_node,String planet_name) {
         this.planet_id = planet_id;
-        this.PlanetNode = PlanetNode;
-        this.PlanetName = PlanetName;
+        this.planet_node = planet_node;
+        this.planet_name = planet_name;
     }
-
 
     public long getPlanet_id() {
         return planet_id;
@@ -29,28 +34,28 @@ public class Planet {
         this.planet_id = planet_id;
     }
 
-    public String getPlanetNode() {
-        return PlanetNode;
+    public String getPlanet_node() {
+        return planet_node;
     }
 
-    public void setPlanetNode(String planetNode) {
-        PlanetNode = planetNode;
+    public void setPlanet_node(String planet_node) {
+        this.planet_node = planet_node;
     }
 
-    public String getPlanetName() {
-        return PlanetName;
+    public String getPlanet_name() {
+        return planet_name;
     }
 
-    public void setPlanetName(String planetName) {
-        PlanetName = planetName;
+    public void setPlanet_name(String planet_name) {
+        this.planet_name = planet_name;
     }
 
     @Override
     public String toString() {
         return "Planet{" +
                 "planet_id=" + planet_id +
-                ", PlanetNode='" + PlanetNode + '\'' +
-                ", PlanetName='" + PlanetName + '\'' +
+                ", planet_node='" + planet_node + '\'' +
+                ", planet_name='" + planet_name + '\'' +
                 '}';
     }
 }
