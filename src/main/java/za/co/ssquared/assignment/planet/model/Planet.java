@@ -18,6 +18,9 @@ public class Planet {
     @Column(name = "planet_name")
     private String planet_name;
 
+    @Column(name = "distance_from_source")
+    private int distance_from_source = Integer.MAX_VALUE;
+
     public Planet(){}
 
     public Planet(long planet_id,String planet_node,String planet_name) {
@@ -57,5 +60,13 @@ public class Planet {
                 ", planet_node='" + planet_node + '\'' +
                 ", planet_name='" + planet_name + '\'' +
                 '}';
+    }
+
+    public void setDistance_from_source(int distance_from_source) {
+        this.distance_from_source = distance_from_source;
+    }
+
+    public int getDistance_from_source() {
+        return distance_from_source;
     }
 }

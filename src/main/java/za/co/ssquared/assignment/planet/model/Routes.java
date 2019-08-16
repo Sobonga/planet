@@ -22,11 +22,11 @@ public class Routes {
     private String planet_destination;
 
     @Column(name = "distance")
-    private double distance;
+    private int distance;
 
     public Routes(){}
 
-    public Routes(long routes_id,int route,String planet_origin,String planet_destination,double distance) {
+    public Routes(long routes_id,int route,String planet_origin,String planet_destination,int distance) {
         this.routes_id = routes_id;
         this.route = route;
         this.planet_origin = planet_origin;
@@ -66,12 +66,20 @@ public class Routes {
         this.planet_destination = planet_destination;
     }
 
-    public double getDistance() {
+    public int getDistance() {
         return distance;
     }
 
-    public void setDistance(double distance) {
+    public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    public String getNeighbourIndex(String nodeIndex) {
+        if (this.planet_origin == nodeIndex) {
+            return this.planet_destination;
+        } else {
+            return this.planet_origin;
+        }
     }
 
     @Override

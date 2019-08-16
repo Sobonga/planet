@@ -19,7 +19,7 @@ public class Node {
     private boolean visited;
 
     @Column(name = "edges")
-    private ArrayList<Edge> edges = new ArrayList<Edge>(); // now we must create edges
+    private ArrayList<Routes> routes = new ArrayList<Routes>(); // now we must create edges
 
     public int getDistance_from_source() {
         return distance_from_source;
@@ -33,11 +33,11 @@ public class Node {
     public void setVisited(boolean visited) {
         this.visited = visited;
     }
-    public ArrayList<Edge> getEdges() {
-        return edges;
+    public ArrayList<Routes> getRoutes() {
+        return routes;
     }
-    public void setEdges(ArrayList<Edge> edges) {
-        this.edges = edges;
+    public void setRoutes(ArrayList<Routes> routes) {
+        this.routes = routes;
     }
 
     public long getNode_id() {

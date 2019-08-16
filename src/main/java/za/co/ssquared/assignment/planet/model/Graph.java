@@ -20,36 +20,36 @@ public class Graph {
     private int no_of_nodes;
 
     @Column(name = "edges")
-    private Edge[] edges;
+    private Routes[] routes;
 
-    @Column(name = "no_of_edges")
-    private int no_of_edges;
+    @Column(name = "no_of_routes")
+    private int no_of_routes;
 
 
-    public Graph(Edge[] edges) {
-        this.edges = edges;
+    public Graph(Routes[] routes) {
+        this.routes = routes;
 
         // create all nodes ready to be updated with the edges
 
-        this.no_of_nodes = calculateNoOfNodes(edges);
+        this.no_of_nodes = calculateNoOfNodes(routes);
         this.nodes = new Node[this.no_of_nodes];
         for (int n = 0; n < this.no_of_nodes; n++) {
             this.nodes[n] = new Node();
         }
         // add all the edges to the nodes, each edge added to two nodes (to and from)
-        this.no_of_edges = edges.length;
-        for (int edgeToAdd = 0; edgeToAdd < this.no_of_edges; edgeToAdd++) {
-            this.nodes[edges[edgeToAdd].getTo_node_index ()].getEdges().add(edges[edgeToAdd]);
-            this.nodes[edges[edgeToAdd].getTo_node_index ()].getEdges().add(edges[edgeToAdd]);
+        this.no_of_routes = routes.length;
+        for (int routeToAdd = 0; routeToAdd < this.no_of_routes; routeToAdd++) {
+            this.nodes[routes[routeToAdd].getDistance ()].getRoutes ().add(routes[routeToAdd]);
+            this.nodes[routes[routeToAdd].getDistance ()].getRoutes ().add(routes[routeToAdd]);
         }
     }
-    private int calculateNoOfNodes(Edge[] edges) {
+    private int calculateNoOfNodes(Routes[] routes) {
         int noOfNodes = 0;
-        for (Edge e : edges) {
-            if (e.getTo_node_index () > noOfNodes)
-                noOfNodes = e.getTo_node_index ();
-            if (e.getTo_node_index () > noOfNodes)
-                noOfNodes = e.getTo_node_index ();
+        for (Routes r : routes) {
+            if (r.getTo_node_index () > noOfNodes)
+                noOfNodes = r.getTo_node_index ();
+            if (r.getTo_node_index () > noOfNodes)
+                noOfNodes = r.getTo_node_index ();
         }
         noOfNodes++;
         return noOfNodes;

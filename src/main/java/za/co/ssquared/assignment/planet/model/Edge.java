@@ -12,40 +12,48 @@ public class Edge {
     private long edge_id;
 
     @Column(name = "from_node_index")
-    private int from_node_index;
+    private int planet_origin;
 
     @Column(name = "to_node_index")
-    private int to_node_index;
+    private int planet_destination;
 
     @Column(name = "length")
-    private int length;
+    private int distance;
 
-    public Edge(int fromNodeIndex, int toNodeIndex, int length, long edge_id) {
-        this.from_node_index = fromNodeIndex;
-        this.to_node_index = toNodeIndex;
-        this.length = length;
+    @Column(name = "length")
+    private int route;
+
+    public Edge(int planet_origin, int planet_destination, int distance, long edge_id, int route) {
+        this.planet_origin = planet_origin;
+        this.planet_destination = planet_destination;
+        this.distance = distance;
         this.edge_id = edge_id;
+        this.route = route;
     }
-    public int getFrom_node_index() {
-        return from_node_index;
+    public int getPlanet_origin() {
+        return planet_origin;
     }
-    public int getTo_node_index() {
-        return to_node_index;
+    public int getPlanet_destination() {
+        return planet_destination;
     }
-    public int getLength() {
-        return length;
+    public int getDistance() {
+        return distance;
     }
 
     public long getEdge_id() {
         return edge_id;
     }
 
+    public int GetRoute(){
+        return route;
+    }
+
     // determines the neighbouring node of a supplied node, based on the two nodes connected by this edge
     public int getNeighbourIndex(int nodeIndex) {
-        if (this.from_node_index == nodeIndex) {
-            return this.to_node_index;
+        if (this.planet_origin == nodeIndex) {
+            return this.planet_destination;
         } else {
-            return this.from_node_index;
+            return this.planet_origin;
         }
     }
 
